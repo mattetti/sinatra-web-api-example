@@ -39,7 +39,7 @@ module TestApi
     end
 
     response = Requester.new.send(verb, uri, params)
-    @json_response = JsonWrapperResponse.new(response, :verb => verb, :uri => uri)
+    @json_response = JsonWrapperResponse.new(response, :verb => verb, :uri => service_uri)
   end
 
   def get(uri, params=nil)
