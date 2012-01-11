@@ -5,6 +5,7 @@ require 'json'
 require 'json_response_verification'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'bootloader')
 
+ENV['NO_ROUTE_PRINT'] = 'true'
 Bootloader.start
 WSDSL.send(:include, JSONResponseVerification)
 
