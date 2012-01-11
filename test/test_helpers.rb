@@ -36,7 +36,8 @@ module TestApi
       end
     end
 
-    @json_response = JsonWrapperResponse.new(Requester.new.send(verb, uri, params), :verb => verb, :uri => uri)
+    response = Requester.new.send(verb, uri, params)
+    @json_response = JsonWrapperResponse.new(response, :verb => verb, :uri => uri)
   end
 
   def get(uri, params=nil)
@@ -85,7 +86,7 @@ class JsonWrapperResponse
   end
 
   def body
-    @body ||= JSON.load(rest_response.body)
+    @body ||= JSON.load(rest_response.body) rescue rest_response.body
   end
 
   def success?
@@ -104,14 +105,14 @@ class JsonWrapperResponse
     body.send(meth, args)
   end
 
-  def_delegators :rest_response, :code, :headers, :raw_headers, :cookies
+  def_delegators :rest_response, :code, :headers, :raw_headers, :cookies, :status, :errors
 end
 
 
 # Custom assertions
 def assert_api_response(response=nil, message=nil)
   response ||= TestApi.json_response if Object.const_defined?(:TestApi)
-  assert response.success?, message
+  assert response.success?, message || response.rest_response.body + "\n" + response.errors
   service = WSList.all.find{|s| s.verb == response.verb && s.url == response.uri[1..-1]}
   raise "Service for (#{response.verb.upcase} #{response.uri[1..-1]}) not found" unless service
   valid, errors = service.validate_hash_response(response.body)
