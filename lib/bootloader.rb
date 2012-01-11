@@ -36,7 +36,7 @@ module Bootloader
     LOGGER.info "Running in #{RACK_ENV} mode"
   end
 
-  def load_environment(env=nil)
+  def load_environment(env=RACK_ENV)
     # Load the detault which can be overwritten or extended by specific
     # env config files.
     require File.join(ROOT, 'config', 'environments', 'default.rb')
