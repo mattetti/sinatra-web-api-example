@@ -1,3 +1,7 @@
+if RUBY_VERSION =~ /1.8/
+  require 'rubygems'
+  require 'backports'
+end
 require 'bundler'
 require 'logger'
 Bundler.require

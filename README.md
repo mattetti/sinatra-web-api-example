@@ -3,7 +3,8 @@
 ## App Usage
 
 To start the server:
-
+    
+    $ bundle install
     $ rackup
 
 Or 
