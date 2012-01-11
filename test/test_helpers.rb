@@ -21,15 +21,15 @@ end
 module TestApi
   module_function
 
-  URL_PLACEHOLDER = /\/(:[a-z A-Z _]+)\/*/
+  URL_PLACEHOLDER = /\/*(:[a-z A-Z _]+)\/*/
 
   def request(verb, uri, params={})
     params ||= {}
     service_uri = uri.dup
-    matching = uri.match URL_PLACEHOLDER
-    if matching
+    matching = uri.scan URL_PLACEHOLDER
+    unless matching.empty?
       # replace the placeholder by real value
-      matching.captures.each_with_index do |str, idx|
+      matching.flatten.each_with_index do |str, idx|
         key = str.delete(":").to_sym
         value = params[key].to_s
         # delete the value from the params
@@ -113,8 +113,8 @@ end
 
 # Custom assertions
 def assert_api_response(response=nil, message=nil)
-  response ||= TestApi.json_response if Object.const_defined?(:TestApi)
-  assert response.success?, message || response.rest_response.body + "\n" + response.errors
+  response ||= TestApi.json_response
+  assert response.success?, message || ["Body: #{response.rest_response.body}", "Errors: #{response.errors}", "Status code: #{response.status}"].join("\n")
   service = WSList.all.find{|s| s.verb == response.verb && s.url == response.uri[1..-1]}
   raise "Service for (#{response.verb.upcase} #{response.uri[1..-1]}) not found" unless service
   valid, errors = service.validate_hash_response(response.body)
