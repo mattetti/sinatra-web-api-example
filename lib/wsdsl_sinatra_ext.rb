@@ -57,7 +57,12 @@ class WSDSL
         # raises an exception if the params are not valid
         # otherwise update the app params with potentially new params (using default values)   
         # note that if a type is mentioned for a params, the object will be cast to this object type 
-        @params = ParamsVerification.validate!(app.params, service.defined_params)
+        if app.params['splat']
+          processed_params = app.params.dup
+          processed_params.delete('splat')
+          processed_params.delete('captures')
+        end
+        @params = ParamsVerification.validate!((processed_params || app.params), service.defined_params)
       rescue Exception => e
         LOGGER.error e.message
         LOGGER.error "passed params: #{app.params.inspect}"
