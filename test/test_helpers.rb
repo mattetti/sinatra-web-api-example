@@ -32,6 +32,8 @@ module TestApi
       matching.captures.each_with_index do |str, idx|
         key = str.delete(":").to_sym
         value = params[key].to_s
+        # delete the value from the params
+        params.delete(key)
         uri = uri.gsub(str, value)
       end
     end
