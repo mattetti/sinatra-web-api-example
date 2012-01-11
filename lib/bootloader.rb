@@ -1,10 +1,10 @@
+require 'bundler'
+Bundler.require
 if RUBY_VERSION =~ /1.8/
   require 'rubygems'
   require 'backports'
 end
-require 'bundler'
 require 'logger'
-Bundler.require
 ROOT = File.expand_path('..', File.dirname(__FILE__))
 LOGGER = Logger.new($stdout)
 
