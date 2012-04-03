@@ -1,4 +1,5 @@
-# Sinatra + WSDSL + ActiveRecord Example app
+# Example app using a WebService DSL to write/organize your code.
+
 
 ## App Usage
 
@@ -81,7 +82,7 @@ The DSL for writing an API is straight forward:
 
 APIs are described in files named the way you want but stored in the API
 folder.
-The DSL used comes from the WSDSL gem. It works by defining the end
+The DSL used comes from the [WSDSL](https://github.com/mattetti/wsdsl) gem. It works by defining the end
 point url (with or without placeholders) and a few key elements of the
 services:
 
@@ -165,7 +166,7 @@ such as `TestAPI.last_response`, `TestAPI.json_response`,
 
 ## More about the DSL
 
-This app is built on top of Sinatra and the WSDSL (WebService DSL gem).
+This app is built on top of Sinatra and the [WSDSL](https://github.com/mattetti/wsdsl) (WebService DSL gem, not related to WSDL).
 Reasons for a DSL vs the standard Rails approach:
 
 1. API design becomes the number 1 focus.
