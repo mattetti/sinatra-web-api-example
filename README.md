@@ -43,11 +43,40 @@ available to pre seed the DB.
 
 Files in the lib folder aren't automatically required.
 
-## Tests
 
-The app test suite uses a series of helpers wrapping rack/test to test
-a request going through the stack but without the overhead of actually
-doing a real HTTP request.
+## Writing an API
+
+The DSL for writing an API is straight forward:
+
+    describe_service "hello_world" do |service|
+      service.formats   :json
+      service.http_verb :get
+      service.disable_auth # on by default
+
+      # INPUT
+      service.param.string  :name, :default => 'World'
+
+      # OUTPUT
+      service.response do |response|
+        response.object do |obj|
+          obj.string :message, :doc => "The greeting message sent back. Defaults to 'World'"
+          obj.datetime :at, :doc => "The timestamp of when the message was dispatched"
+        end
+      end
+
+      # DOCUMENTATION
+      service.documentation do |doc|
+        doc.overall "This service provides a simple hello world implementation example."
+        doc.param :name, "The name of the person to greet."
+        doc.example "<code>curl -I 'http://localhost:9292/hello_world?name=Matt'</code>"
+     end
+
+      # ACTION/IMPLEMENTATION
+      service.implementation do
+        {:message => "Hello #{params[:name]}", :at => Time.now}.to_json
+      end
+
+    end
 
 
 APIs are described in files named the way you want but stored in the API
@@ -105,6 +134,33 @@ services:
       end
 
     end
+
+## Tests
+
+The app test suite uses a series of helpers wrapping rack/test to test
+a request going through the stack but without the overhead of actually
+doing a real HTTP request.
+
+To validate that a service responds as defined in the DSL, you can use
+the provided helpers, here is an example:
+
+    class HelloWorldTest < MiniTest::Unit::TestCase
+
+      def test_response
+        TestApi.get "/hello_world", :name => 'Matt'
+        assert_api_response
+      end
+
+    end
+
+
+The `TestAPI` module dispatches a request to the app and the
+`assert_api_response` helper will validate that the response matches the
+service description.
+
+Look at the `test/test_helpers.rb` file to see the many other helpers
+such as `TestAPI.last_response`, `TestAPI.json_response`,
+`TestAPI.mobile_get` etc...
 
 
 ## More about the DSL
@@ -185,6 +241,7 @@ The code shouldn't need maintenance except for bugs being found or new requested
 
 ## TODO:
 
+* RSpec helpers
 * Make the ORM configurable.
 * Generators for blank APIs and migrations.
 * Provide Rack Client as a test alternative to make real HTTP calls.

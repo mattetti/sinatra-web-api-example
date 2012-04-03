@@ -18,7 +18,7 @@ describe_service "hello_world" do |service|
   service.documentation do |doc|
   	doc.overall "This service provides a simple hello world implementation example."
   	doc.param :name, "The name of the person to greet."
-  	doc.example "<code>http://localhost:9292/hello_world?name=Matt</code>"
+  	doc.example "<code>curl -I 'http://localhost:9292/hello_world?name=Matt'</code>"
  end
 
   # ACTION/IMPLEMENTATION
