@@ -3,7 +3,7 @@ source "http://rubygems.org"
 # web engine
 gem "sinatra", "1.3.2"
 # service DSL
-gem "wsdsl", "0.5.0"
+gem "wsdsl", "1.0.0"
 #
 gem 'mysql2', '0.3.11'
 gem 'activerecord', '3.1.3'
@@ -15,6 +15,6 @@ end
 
 if ENV['RACK_ENV'] != "production"
   gem "rack-test", "0.6.1"
-  gem "foreman", "~> 0.26.1"
-  gem "puma", "~> 0.9.3"
+  gem "foreman"
+  # gem "puma", "~> 0.9.3"
 end

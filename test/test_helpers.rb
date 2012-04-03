@@ -1,9 +1,14 @@
 ENV['RACK_ENV'] ||= 'test'
+require 'test/unit'
 require 'rack'
 require 'rack/test'
 require 'json'
 require 'json_response_verification'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'bootloader')
+
+if RUBY_VERSION =~ /1.8/
+  require 'minitest/autorun'
+end
 
 ENV['NO_ROUTE_PRINT'] = 'true'
 Bootloader.start
@@ -22,9 +27,11 @@ end
 module TestApi
   module_function
 
-  URL_PLACEHOLDER = /\/*(:[a-z A-Z _]+)\/*/
+  URL_PLACEHOLDER   = /\/*(:[a-z A-Z _]+)\/*/
+  INTERNAL_X_HEADER = AuthHelpers::INTERNAL_X_HEADER 
+  MOBILE_X_HEADER   = AuthHelpers::MOBILE_X_HEADER
 
-  def request(verb, uri, params={})
+  def request(verb, uri, params={}, headers=nil)
     params ||= {}
     service_uri = uri.dup
     matching = uri.scan URL_PLACEHOLDER
@@ -36,31 +43,78 @@ module TestApi
         # delete the value from the params
         params.delete(key)
         uri = uri.gsub(str, value)
-      end
+        end
     end
-
-    response = Requester.new.send(verb, uri, params)
+    
+    request = Requester.new
+    yield request if block_given?
+    headers.each {|name, value| request.header(name, value) } if headers
+    response = request.send(verb, uri, params)
     @json_response = JsonWrapperResponse.new(response, :verb => verb, :uri => service_uri)
   end
 
-  def get(uri, params=nil)
-    request(:get, uri, params)
+  def mobile_account=(account)
+    @account = account
   end
 
-  def post(uri, params=nil)
-    request(:post, uri, params)
+  def get(uri, params=nil, headers=nil)
+    request(:get, uri, params, headers)
   end
 
-  def put(uri, params=nil)
-    request(:put, uri, params)
+  def internal_get(uri, params=nil, headers=nil)
+    get(uri, params, valid_internal_api_headers(headers))
   end
 
-  def delete(uri, params=nil)
-    request(:delete, uri, params)
+  def mobile_get(uri, params=nil, headers=nil)
+    request(:get, uri, params, mobile_headers(headers))
   end
 
-  def head(uri, params=nil)
-    request(:head, uri, params)
+  def post(uri, params=nil, headers=nil)
+    request(:post, uri, params, headers)
+  end
+
+  def internal_post(uri, params=nil, headers=nil)
+    post(uri, params, valid_internal_api_headers(headers))
+  end
+
+  def mobile_post(uri, params=nil, headers=nil)
+    request(:post, uri, params, mobile_headers(headers))
+  end
+
+  def put(uri, params=nil, headers=nil)
+    request(:put, uri, params, headers)
+  end
+
+  def internal_put(uri, params=nil, headers=nil)
+    put(uri, params, valid_internal_api_headers(headers))
+  end
+
+  def mobile_put(uri, params=nil, headers=nil)
+    request(:put, uri, params, mobile_headers(headers))
+  end
+
+  def delete(uri, params=nil, headers=nil)
+    request(:delete, uri, params, headers)
+  end
+
+  def internal_delete(uri, params=nil, headers=nil)
+    delete(uri, params, valid_internal_api_headers(headers))
+  end
+
+  def mobile_delete(uri, params=nil, headers=nil)
+    request(:delete, uri, params, mobile_headers(headers))
+  end
+
+  def head(uri, params=nil, headers=nil)
+    request(:head, uri, params, headers)
+  end
+
+  def internal_head(uri, params=nil, headers=nil)
+    head(uri, params, valid_internal_api_headers(headers))
+  end
+
+  def mobile_head(uri, params=nil, headers=nil)
+    request(:head, uri, params, mobile_headers(headers))
   end
 
   def json_response
@@ -69,6 +123,18 @@ module TestApi
 
   def last_response
     @json_response.rest_response if @json_response
+  end
+
+  def valid_internal_api_headers(headers)
+    custom_headers = {INTERNAL_X_HEADER => AuthHelpers::ALLOWED_API_KEYS[0]}
+    custom_headers.merge!(headers) if headers
+    custom_headers
+  end
+
+  def mobile_headers(headers)
+    custom_headers = {MOBILE_X_HEADER => @account ? Base64.urlsafe_encode64(@account.mobile_token) : nil}
+    custom_headers.merge!(headers) if headers
+    custom_headers
   end
 
 end
@@ -95,6 +161,10 @@ class JsonWrapperResponse
   def success?
     @rest_response.status == 200
   end
+  
+  def redirected?
+    @rest_response.status.to_s =~ /30\d/
+  end
 
   def [](val)
     if body
@@ -115,9 +185,22 @@ end
 # Custom assertions
 def assert_api_response(response=nil, message=nil)
   response ||= TestApi.json_response
+  print response.rest_response.errors if response.status === 500
   assert response.success?, message || ["Body: #{response.rest_response.body}", "Errors: #{response.errors}", "Status code: #{response.status}"].join("\n")
   service = WSList.all.find{|s| s.verb == response.verb && s.url == response.uri[1..-1]}
   raise "Service for (#{response.verb.upcase} #{response.uri[1..-1]}) not found" unless service
-  valid, errors = service.validate_hash_response(response.body)
-  assert valid, errors.join(" & ") || message
+  unless service.response.nodes.empty?
+    assert response.body.is_a?(Hash), "Invalid JSON response:\n#{response.body}"
+    valid, errors = service.validate_hash_response(response.body)
+    assert valid, errors.join(" & ") || message
+  end
+end
+
+def assert_api_response_with_redirection(redirection_url=nil)
+  response = TestApi.json_response
+  print response.rest_response.errors if response.status === 500
+  assert response.status == 302, "Redirection expect, but got #{response.status}"
+  if redirection_url
+    assert response.headers["location"], redirection_url
+  end
 end

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Bootstrap, from Twitter</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href=images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="#">Web APIs Documentation</a>
+          <ul class="nav">
+            <li class="active"><a href="index.html">Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="sidebar">
+        <div class="well">
+          <h5>Available APIs</h5>
+          <ul>
+            <% WSList.all.sort{|a,b| a.url <=> b.url}.each do |api| %>
+              <li><a href="#<%= "raw-#{api.verb}-#{api.url}" %>"><%= api.url %> [<%= api.verb.upcase %>]</a></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+      <div class="content">
+        <div class="hero-unit">
+          <h1>Web APIs</h1>
+          <p>You will find on left, the list of all the web APIs offered by this app.</p>
+        </div>
+
+        <% WSList.all.each do |api| %>
+          <div class="" id="<%= "raw-#{api.verb}-#{api.url}" %>">
+            <div>
+              <h2><%= api.verb.upcase %> <%= '[SSL]' if api.ssl %> /<%= api.url %></h2>
+              <% if api.auth_required %>
+                <span class='label important'>Authentication required</span>
+              <% end %>
+              <%= "<p>#{api.doc.desc}</p>" if api.doc.desc %>
+              <%# TODO support for namespaced params %>
+              <% [["Required", :required_rules], ["Optional", :optional_rules]].each do |label,rule_meth| %>
+                <% unless api.send(rule_meth).empty? %>
+                  <h3><%= label %> Params</h3>
+                  <ul>
+                    <% api.send(rule_meth).each do |rule| %> 
+                      <li>
+                        <span class='label notice'><%= rule.name %></span> of type <span class='label success'><%= rule.options[:type] || 'String' %></span>
+                        <% if desc = api.doc.params_doc[rule.name.to_sym] %>
+                           <%= desc %>&nbsp;
+                        <% end %>
+                        <% if options = rule.options[:options] %>
+                          Value Options: <span class='label'><%= options.join(', ') %></span>&nbsp;
+                        <% end %>
+                        <% if default = rule.options[:default] %>
+                          Default Value:  <span class='label'><%= default %></span>&nbsp;
+                        <% end %>
+                      </li>
+                      <% end %>
+                    </ul>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div>
+              <% if api.response.nodes.any? %>
+                <h3>Response description</h3>
+                <% api.response.elements.each do |el| %>
+                    <%= el.to_html %>
+                <% end %>
+                <% api.response.arrays.each do |arr| %>
+                  <%= arr.to_html %>
+                <% end %>
+              </ul>
+              <h4>Response example</h4>
+              <p><code><%= api.response.to_json %></code></p>
+            <% end %>
+          </div>
+
+        </div>
+        <hr>
+      <% end %>
+
+      <footer>
+        <p>&copy; You <%= Time.now.year %></p>
+      </footer>
+      </div>
+    </div>
+
+  </body>
+</html>

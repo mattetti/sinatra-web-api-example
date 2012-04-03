@@ -30,3 +30,4 @@ end
 
 Bootloader.set_loadpath
 load File.join('tasks', 'db.rake')
+load File.join('tasks', 'doc.rake')

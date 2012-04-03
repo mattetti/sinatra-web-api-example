@@ -38,7 +38,7 @@ class WSDSL
     # The service controller might be loaded outside of a Sinatra App
     # in this case, we don't need to load the helpers
     if Object.const_defined?(:Sinatra)
-      include Sinatra::Helpers 
+      include Sinatra::Helpers
     end
 
     def initialize(service, &block)
@@ -57,6 +57,8 @@ class WSDSL
         # raises an exception if the params are not valid
         # otherwise update the app params with potentially new params (using default values)   
         # note that if a type is mentioned for a params, the object will be cast to this object type 
+        #
+        # removing the fake sinatra params since v1.3 added this. (should be eventually removed)
         if app.params['splat']
           processed_params = app.params.dup
           processed_params.delete('splat')
@@ -71,7 +73,7 @@ class WSDSL
 
       # Define WSDSL::RequestHandler#authorization_check in your app if
       # you want to use an auth check.
-      authorization_check if self.respond_to?(:authorization_check)
+      pre_dispatch_hook if self.respond_to?(:pre_dispatch_hook)
       service_dispatch
     end
 
@@ -95,7 +97,7 @@ class WSDSL
   def load_sinatra_route
     service     = self
     upcase_verb = service.verb.to_s.upcase
-    LOGGER.info "#{self.http_verb} /#{self.url}" unless ENV['NO_ROUTE_PRINT']
+    LOGGER.info "Available endpoint: #{self.http_verb.upcase} /#{self.url}" unless ENV['NO_ROUTE_PRINT']
     raise "DSL is missing the implementation block" unless self.handler && self.handler.respond_to?(:service_dispatch)
 
     # Define the route directly to save some object allocations on the critical path

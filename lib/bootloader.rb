@@ -1,12 +1,12 @@
-require 'bundler'
-Bundler.require
 if RUBY_VERSION =~ /1.8/
   require 'rubygems'
   require 'backports'
 end
+require 'bundler'
+Bundler.setup
 require 'logger'
+require 'json'
 ROOT = File.expand_path('..', File.dirname(__FILE__))
-LOGGER = Logger.new($stdout)
 
 module Bootloader
   module_function
@@ -34,10 +34,10 @@ module Bootloader
 
   def set_env
     if !Object.const_defined?(:RACK_ENV)
-      ENV['RACK_ENV'] ||= "development"
+      ENV['RACK_ENV'] ||= ENV['RAILS_ENV'] || 'development'
       Object.const_set(:RACK_ENV, ENV['RACK_ENV'])
     end
-    LOGGER.info "Running in #{RACK_ENV} mode"
+    puts "Running in #{RACK_ENV} mode" if RACK_ENV == 'development'
   end
 
   def load_environment(env=RACK_ENV)
@@ -48,8 +48,14 @@ module Bootloader
     if File.exist?(env_file)
       require env_file
     else
-      LOGGER.debug "Environment file: #{env_file} couldn't be found, using only the default environment config instead." unless env == 'development'
+      debug_msg = "Environment file: #{env_file} couldn't be found, using only the default environment config instead." unless env == 'development'
     end
+    # making sure we have a LOGGER constant defined.
+    unless Object.const_defined?(:LOGGER)
+      Object.const_set(:LOGGER, Logger.new($stdout))
+    end
+    LOGGER.debug(debug_msg) if debug_msg
+    require File.join(ROOT, 'config', 'app_config')
   end
 
   def set_loadpath
@@ -61,8 +67,9 @@ module Bootloader
   def load_lib_dependencies
     # WSDSL is the web service DSL gem used to define services.
     require 'wsdsl'
-    require 'wsdsl_sinatra_ext'
     require 'sinatra'
+    require 'auth_helpers'
+    require 'wsdsl_sinatra_ext'
     require 'active_record'
     require 'base64'
     require 'digest/md5'
