@@ -6,13 +6,17 @@
 To start the server:
     
     $ bundle install
-
     $ rackup
 
-Or 
+Or using foreman:
+
     $ foreman start
 
-if you have foreman installed.
+Or using guard:
+
+    $ bundle exec guard
+
+The former two run at http://localhost:9292; the latter runs at http://localhost:4000.
 
 To use the command line:
 
@@ -167,6 +171,10 @@ service description.
 Look at the `test/test_helpers.rb` file to see the many other helpers
 such as `TestAPI.last_response`, `TestAPI.json_response`,
 `TestAPI.mobile_get` etc...
+
+To automatically re-run tests whilst you are editing your API or your tests:
+
+    bundle exec guard
 
 
 ## More about the DSL
