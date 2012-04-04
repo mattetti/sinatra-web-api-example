@@ -12,7 +12,7 @@ end
 
 ENV['NO_ROUTE_PRINT'] = 'true'
 Bootloader.start
-WSDSL.send(:include, JSONResponseVerification)
+WeaselDiesel.send(:include, JSONResponseVerification)
 
 ActiveRecord::Base.logger = nil
 

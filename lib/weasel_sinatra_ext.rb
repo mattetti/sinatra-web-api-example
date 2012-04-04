@@ -2,12 +2,12 @@ require 'forwardable'
 require 'params_verification'
 require 'json'
 
-class WSDSL
+class WeaselDiesel
 
   class RequestHandler
     extend Forwardable
 
-    # @return [WSDSL] The service served by this controller
+    # @return [WeaselDiesel] The service served by this controller
     # @api public
     attr_reader :service
 
@@ -71,7 +71,7 @@ class WSDSL
         halt 400, {:error => e.message}.to_json
       end
 
-      # Define WSDSL::RequestHandler#authorization_check in your app if
+      # Define WeaselDiesel::RequestHandler#authorization_check in your app if
       # you want to use an auth check.
       pre_dispatch_hook if self.respond_to?(:pre_dispatch_hook)
       service_dispatch

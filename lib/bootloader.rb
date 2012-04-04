@@ -65,11 +65,11 @@ module Bootloader
   end
 
   def load_lib_dependencies
-    # WSDSL is the web service DSL gem used to define services.
-    require 'wsdsl'
+    # WeaselDiesel is the web service DSL gem used to define services.
+    require 'weasel_diesel'
     require 'sinatra'
     require 'auth_helpers'
-    require 'wsdsl_sinatra_ext'
+    require 'weasel_sinatra_ext'
     require 'active_record'
     require 'base64'
     require 'digest/md5'
