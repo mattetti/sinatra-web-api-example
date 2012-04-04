@@ -8,6 +8,8 @@ Rake::TestTask.new do |t|
   t.pattern = "test/**/*_test.rb"
 end
 
+task :default => :test
+
 # boot the app
 task :setup_app do
   ENV['DONT_CONNECT'] = 'true'
