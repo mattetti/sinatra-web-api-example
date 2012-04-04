@@ -49,6 +49,7 @@ Files in the lib folder aren't automatically required.
 
 The DSL for writing an API is straight forward:
 
+``` Ruby
     describe_service "hello_world" do |service|
       service.formats   :json
       service.http_verb :get
@@ -78,14 +79,15 @@ The DSL for writing an API is straight forward:
       end
 
     end
-
+```
 
 APIs are described in files named the way you want but stored in the API
 folder.
-The DSL used comes from the [WSDSL](https://github.com/mattetti/wsdsl) gem. It works by defining the end
+The DSL used comes from the [Weasel Diesel](https://github.com/mattetti/Weasel-Diesel) gem. It works by defining the end
 point url (with or without placeholders) and a few key elements of the
 services:
 
+``` Ruby
     describe_service "uri/to/service" do |service|
       service.http_verb :post  # HTTP verb to access this service
       service.disable_auth # disable the auth check (on by default)
@@ -135,6 +137,7 @@ services:
       end
 
     end
+```
 
 ## Tests
 
@@ -145,6 +148,8 @@ doing a real HTTP request.
 To validate that a service responds as defined in the DSL, you can use
 the provided helpers, here is an example:
 
+
+``` Ruby
     class HelloWorldTest < MiniTest::Unit::TestCase
 
       def test_response
@@ -153,7 +158,7 @@ the provided helpers, here is an example:
       end
 
     end
-
+```
 
 The `TestAPI` module dispatches a request to the app and the
 `assert_api_response` helper will validate that the response matches the
@@ -242,7 +247,13 @@ The code shouldn't need maintenance except for bugs being found or new requested
 
 ## TODO:
 
-* RSpec helpers
+* RSpec helpers/
+* More service examples.
+* Improve documentation templates.
 * Make the ORM configurable.
 * Generators for blank APIs and migrations.
-* Provide Rack Client as a test alternative to make real HTTP calls.
+* Generator to create new apps based on this template.
+* Provide Rack Client as a test alternative to make real HTTP calls and
+  test against a staging environment for instance.
+* Create a test suite that can be run against production to validate a
+  deployment.
