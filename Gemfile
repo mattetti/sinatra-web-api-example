@@ -18,4 +18,6 @@ if ENV['RACK_ENV'] != "production"
   gem "foreman"
   gem "puma"
   gem "minitest"
+  gem "guard-puma"
+  gem "guard-minitest"
 end
