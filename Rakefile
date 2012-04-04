@@ -5,7 +5,7 @@ require File.join(File.dirname(__FILE__), 'lib', 'bootloader')
 Rake::TestTask.new do |t|
   t.libs << "."
   t.libs << 'test'
-  t.pattern = "test/**.rb"
+  t.pattern = "test/**/*_test.rb"
 end
 
 # boot the app

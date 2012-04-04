@@ -17,4 +17,5 @@ if ENV['RACK_ENV'] != "production"
   gem "rack-test", "0.6.1"
   gem "foreman"
   gem "puma"
+  gem "minitest"
 end
