@@ -6,9 +6,7 @@ require 'json'
 require 'json_response_verification'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'bootloader')
 
-if RUBY_VERSION =~ /1.8/
-  require 'minitest/autorun'
-end
+require 'minitest/autorun'
 
 ENV['NO_ROUTE_PRINT'] = 'true'
 Bootloader.start
