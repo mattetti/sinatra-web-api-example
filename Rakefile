@@ -5,8 +5,10 @@ require File.join(File.dirname(__FILE__), 'lib', 'bootloader')
 Rake::TestTask.new do |t|
   t.libs << "."
   t.libs << 'test'
-  t.pattern = "test/**.rb"
+  t.pattern = "test/**/*_test.rb"
 end
+
+task :default => :test
 
 # boot the app
 task :setup_app do
