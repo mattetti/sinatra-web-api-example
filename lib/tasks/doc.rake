@@ -1,6 +1,8 @@
 namespace :doc do
   desc "Generate documentation for the web services"
   task :services do
+    require "launchy"
+    
     ENV['DONT_CONNECT'] = 'true'
     ENV['NO_ROUTE_PRINT'] = 'true'
     require File.expand_path('../../lib/bootloader', File.dirname(__FILE__))
@@ -14,7 +16,7 @@ namespace :doc do
 
     File.open("#{destination}/index.html", "w"){|f| f << template.result(binding)}
 
-    `open #{destination}/index.html` if RUBY_PLATFORM =~ /darwin/ && !ENV['DONT_OPEN']
+    Launchy.open("#{destination}/index.html")
   end
 
   def template
