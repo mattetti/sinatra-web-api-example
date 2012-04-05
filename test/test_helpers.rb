@@ -26,8 +26,8 @@ module TestApi
   module_function
 
   URL_PLACEHOLDER   = /\/*(:[a-z A-Z _]+)\/*/
-  INTERNAL_X_HEADER = AuthHelpers::INTERNAL_X_HEADER 
-  MOBILE_X_HEADER   = AuthHelpers::MOBILE_X_HEADER
+  INTERNAL_X_HEADER = AuthHelpers::INTERNAL_X_HEADER[/HTTP_(.*)/, 1] # strip the header marker added by Rack
+  MOBILE_X_HEADER   = AuthHelpers::MOBILE_X_HEADER[/HTTP_(.*)/, 1]   # strip the header marker added by Rack
 
   def request(verb, uri, params={}, headers=nil)
     params ||= {}
