@@ -179,7 +179,7 @@ To automatically re-run tests whilst you are editing your API or your tests:
 
 ## More about the DSL
 
-This app is built on top of Sinatra and the [WSDSL](https://github.com/mattetti/wsdsl) (WebService DSL gem, not related to WSDL).
+This app is built on top of Sinatra and the [Weasel-Diesel](https://github.com/mattetti/Weasel-Diesel) (WebService DSL gem, not related to WSDL).
 Reasons for a DSL vs the standard Rails approach:
 
 1. API design becomes the number 1 focus.
