@@ -18,8 +18,7 @@ module AuthHelpers
 
   # Implementation example
   def mobile_auth_check
-    # FIXME why is the key HTTP_HTTP_X_MOBILE_TOKEN?!
-    halt 401 unless encoded_token = env["HTTP_" + MOBILE_X_HEADER] # TODO better 'auth token missing' error code?
+    halt 401 unless encoded_token = env[MOBILE_X_HEADER] # TODO better 'auth token missing' error code?
     mobile_token = Base64.urlsafe_decode64(encoded_token)
     # EXAMPLE halt 401 unless Account.find_by_mobile_token(mobile_token)
     true
