@@ -103,7 +103,7 @@ services:
       service.documentation do |doc|
         doc.overall "service description"
         doc.param :email, "Description of the param"
-        doc.param :password, "TDescription of the param"
+        doc.param :password, "Description of the param"
       end
 
       # INPUT
