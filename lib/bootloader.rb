@@ -28,6 +28,20 @@ module Bootloader
     end
   end
 
+    # Boot in console mode
+  def console
+    unless @booted
+      set_env
+      load_environment
+      set_loadpath
+      load_lib_dependencies
+      set_db_connection
+      connect_to_db
+      load_models unless ENV['DONT_CONNECT']
+      @booted =  true
+    end
+  end
+
   def root_path
     ROOT
   end

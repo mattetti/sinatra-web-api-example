@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'irb'
+require File.expand_path('../lib/bootloader', File.dirname(__FILE__))
+Bootloader.console
+IRB.start(__FILE__)
